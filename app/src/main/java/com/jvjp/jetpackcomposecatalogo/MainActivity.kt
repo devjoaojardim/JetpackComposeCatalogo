@@ -1,25 +1,18 @@
 package com.jvjp.jetpackcomposecatalogo
 
 import android.os.Bundle
-import android.text.Editable
-import android.util.Log
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.MarkEmailRead
-import androidx.compose.material.icons.rounded.Star
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,25 +21,55 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.jvjp.jetpackcomposecatalogo.ui.theme.JetpackComposeCatalogoTheme
-import com.jvjp.jetpackcomposecatalogo.ui.theme.Shapes
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             JetpackComposeCatalogoTheme {
-                // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colors.background
                 ) {
-                    MyIcon()
+
+                    var states by remember { mutableStateOf("Aris") }
+                    var show by remember { mutableStateOf(false) }
+                    val myOptions = getOptions(title = listOf("Hola", " Gusto Mucho", "Mazanrana"))
+                    Column() {
+//                        MyBagdeBox()
+                        //MyTrieStatusCheckBox()
+//                        MyRadioButtonList(states, { states = it })
+//                        myOptions.forEach {
+//                            MyCheckBoxWithTextCompleted(it)
+//                        }
+                        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                            Button(onClick = { show = true }) {
+                                Text(text = "Mostra Dialogo")
+                            }
+
+//                            MyAlertDialog(show = show, onDismiss = { show = false },
+//                                onConfirm = {
+//                                    show = false
+//                                Toast.makeText(
+//                                    this@MainActivity,
+//                                    "Funcionou certinho",
+//                                    Toast.LENGTH_SHORT
+//                                ).show()
+//                            })
+                            MyConfirmDialog(show = show, onDismiss = { show = false })
+                        }
+
+                        // MyDropdownMenu()
+
+                    }
                 }
+
+
             }
         }
     }
@@ -56,9 +79,325 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun DefaultPreview() {
     JetpackComposeCatalogoTheme {
-        MyIcon()
+        MyDropdownMenu()
     }
 }
+
+@Composable
+fun MyDropdownMenu() {
+    var selectText by rememberSaveable { mutableStateOf("") }
+    var expanded by rememberSaveable { mutableStateOf(false) }
+    val desserts = listOf("Helado", "Chocolate", "Café", "Fruta", "Natillas", "Chilaqiles")
+
+
+    Column(Modifier.padding(20.dp)) {
+        OutlinedTextField(value = selectText,
+            onValueChange = { selectText = it },
+            enabled = false,
+            readOnly = true,
+            modifier = Modifier
+                .clickable { expanded = true }
+                .fillMaxWidth())
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            desserts.forEach { desserts ->
+                DropdownMenuItem(onClick = {
+                    expanded = false
+                    selectText = desserts
+                }) {
+                    Text(text = desserts)
+                }
+            }
+        }
+
+    }
+
+
+}
+
+@Composable
+fun MyDivider() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    Divider(
+        Modifier
+            .fillMaxWidth()
+            .padding(top = 16.dp, bottom = 16.dp), color = Color.Blue
+    )
+
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun MyBagdeBox() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    BadgedBox(
+        modifier = Modifier.padding(60.dp),
+        badge = {
+            Badge(
+                content = {
+                    Text(modifier = Modifier.padding(2.dp), text = "1")
+                },
+                backgroundColor = Color.Black,
+                contentColor = Color.White,
+                modifier = Modifier.padding(0.dp)
+            )
+        },
+    ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            imageVector = Icons.Default.Notifications,
+            contentDescription = "l",
+            tint = Color.Blue
+        )
+    }
+
+}
+
+@Composable
+fun MyCard() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        elevation = 12.dp,
+        shape = MaterialTheme.shapes.large
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(text = "Ejemplo 1")
+            Text(text = "Ejemplo 2")
+            Text(text = "Ejemplo 3")
+            Text(text = "Ejemplo 4")
+        }
+    }
+
+
+}
+
+
+@Composable
+fun MyRadioButton() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    Column() {
+        Row() {
+            RadioButton(
+                selected = states,
+                onClick = { states = !states },
+            )
+            Text(text = "Ola Mundao", Modifier.padding(top = 12.dp))
+        }
+    }
+
+
+}
+
+@Composable
+fun MyRadioButtonList(states: String, onItemSelected: (String) -> Unit) {
+
+
+    Column(Modifier.fillMaxWidth()) {
+        Row() {
+            RadioButton(selected = states == "Aris", onClick = { onItemSelected("Aris") })
+            Text(text = "Aris", Modifier.padding(top = 12.dp))
+        }
+        Row() {
+            RadioButton(
+                selected = states == "Joao",
+                onClick = { onItemSelected("Joao") },
+            )
+            Text(text = "Joao", Modifier.padding(top = 12.dp))
+        }
+        Row() {
+            RadioButton(
+                selected = states == "Maisa",
+                onClick = { onItemSelected("Maisa") },
+            )
+            Text(text = "Maisa", Modifier.padding(top = 12.dp))
+        }
+        Row() {
+            RadioButton(
+                selected = states == "Bruce",
+                onClick = { onItemSelected("Bruce") },
+            )
+            Text(text = "Bruce", Modifier.padding(top = 12.dp))
+        }
+        Row() {
+            RadioButton(
+                selected = states == "Peter",
+                onClick = { onItemSelected("Peter") },
+            )
+            Text(text = "Peter", Modifier.padding(top = 12.dp))
+        }
+    }
+
+
+}
+
+@Composable
+fun getOptions(title: List<String>): List<CheckInfo> {
+    return title.map {
+        var status by rememberSaveable { mutableStateOf(false) }
+        CheckInfo(
+            title = it,
+            selected = status,
+            onCheckedChange = {
+                status = it
+            }
+        )
+    }
+
+}
+
+@Composable
+fun MyCheckBoxWithTextCompleted(checkInfo: CheckInfo) {
+
+
+    Row(Modifier.padding(8.dp)) {
+        Checkbox(
+            checked = checkInfo.selected,
+            onCheckedChange = { checkInfo.onCheckedChange(!checkInfo.selected) })
+        Text(text = checkInfo.title, Modifier.padding(top = 12.dp))
+    }
+
+
+}
+
+
+@Composable
+fun MyCheckBoxWithText() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    Row(Modifier.padding(8.dp)) {
+        Checkbox(checked = states, onCheckedChange = { states = !states })
+        Text(text = "Ola Mundo", Modifier.padding(top = 12.dp))
+    }
+
+
+}
+
+@Composable
+fun MyTrieStatusCheckBox() {
+    var states by rememberSaveable { mutableStateOf(ToggleableState.Off) }
+
+    TriStateCheckbox(state = states, onClick = {
+        states = when (states) {
+            ToggleableState.On -> ToggleableState.Off
+            ToggleableState.Off -> ToggleableState.Indeterminate
+            ToggleableState.Indeterminate -> ToggleableState.On
+        }
+    })
+
+//    Checkbox(
+//        state = states,
+//        onCheckedChange = { states = !states },
+//        colors = CheckboxDefaults.colors(
+//            checkedColor = Color.Green,
+//            uncheckedColor = Color.Red,
+//        )
+//    )
+
+
+}
+
+@Composable
+fun MyCheckBox() {
+    var states by rememberSaveable { mutableStateOf(false) }
+
+    Checkbox(
+        checked = states,
+        onCheckedChange = { states = !states },
+        colors = CheckboxDefaults.colors(
+            checkedColor = Color.Green,
+            uncheckedColor = Color.Red,
+        )
+    )
+
+
+}
+
+@Composable
+fun MySwitch() {
+    var states by rememberSaveable { mutableStateOf(true) }
+
+    Switch(
+        checked = states,
+        onCheckedChange = { states = !states },
+        colors = SwitchDefaults.colors(
+            uncheckedThumbColor = Color.Red,
+            checkedThumbColor = Color.Green,
+        )
+    )
+
+}
+
+@Composable
+fun MyProgressBarAvancado() {
+
+    var showLoadingProgress by rememberSaveable { mutableStateOf(0f) }
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        LinearProgressIndicator(color = Color.Magenta, progress = showLoadingProgress)
+
+        Row(
+            Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Button(
+                onClick = { showLoadingProgress = showLoadingProgress + 0.1f },
+                modifier = Modifier.padding(top = 15.dp)
+            ) {
+                Text(text = "Incrementar")
+            }
+            Button(
+                onClick = { showLoadingProgress = showLoadingProgress - 0.1f },
+                modifier = Modifier.padding(top = 15.dp)
+            ) {
+                Text(text = "Reducir")
+            }
+        }
+
+    }
+}
+
+@Composable
+fun MyProgressBar() {
+    var showLoadingProgress by rememberSaveable { mutableStateOf(false) }
+    Column(
+        Modifier
+            .fillMaxSize()
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+
+        if (showLoadingProgress) {
+            CircularProgressIndicator(color = Color.Magenta)
+            LinearProgressIndicator(
+                modifier = Modifier.padding(top = 32.dp),
+                color = Color.Gray,
+                backgroundColor = Color.LightGray
+            )
+        }
+        Button(onClick = { showLoadingProgress = true }, modifier = Modifier.padding(top = 15.dp)) {
+            Text(text = "Click")
+        }
+
+    }
+}
+
 @Composable
 fun MyIcon() {
     Column(
@@ -78,6 +417,7 @@ fun MyIcon() {
 
     }
 }
+
 @Composable
 fun MyImage() {
     Column(
